@@ -1,0 +1,196 @@
+<html>
+<head>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            cursor: help;
+        }
+    </style>
+</head>
+<body>
+<script>
+const port = prompt('localhost:XXXX?')
+
+document.write(`<script src="http://localhost:${port}/socket.io/socket.io.js"><\/script>`)
+
+const canvas = document.createElement('canvas')
+document.body.appendChild(canvas)
+
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
+
+const ctx = canvas.getContext('2d')
+
+let state
+const ENTITY_SIZE = 20
+const colors = ['red', 'blue', 'green', 'yellow', 'magenta', 'cyan']
+
+let cameraX = 0
+let cameraY = 0
+let closestEntity = null
+let selection = null
+
+function forEachEntity (callback) {
+    for (const entityType in state) {
+        const entityArray = state[entityType]
+        if (entityArray instanceof Array) {
+            entityArray.forEach(entity => {
+                callback(entity, entityType)
+            })
+        }
+    }
+}
+
+function findEntity (condition) {
+    let target = null
+    forEachEntity(entity => {
+        if (condition(entity)) target = entity
+    })
+    return target
+}
+
+let colorNextI = 0
+const entityToColor = {}
+function getEntityColor (entityType) {
+    let color = entityToColor[entityType]
+    if (!color) {
+        color = colors[colorNextI++]
+        entityToColor[entityType] = color
+    }
+    return color
+}
+
+function render () {
+    requestAnimationFrame(render)
+    if (state == null) return
+
+    // ctx.globalAlpha = 0.2
+    ctx.fillStyle = 'white'
+    ctx.fillRect(0,0,canvas.width,canvas.height)
+    ctx.globalAlpha = 1
+
+    if (selection) {
+        cameraX = canvas.width/2 - selection.x
+        cameraY = canvas.height/2 - selection.y
+    } else {
+        if (keyboard.up) cameraY++
+        if (keyboard.down) cameraY--
+        if (keyboard.left) cameraX++
+        if (keyboard.right) cameraX--
+    }
+
+    ctx.save()
+    ctx.translate(cameraX, cameraY)
+    
+    ctx.globalAlpha = 0.25
+    for (let i = -1000; i <= 1000; i += 100) {
+        ctx.lineWidth = (i === 0) ? 3 : 1
+        ctx.beginPath()
+        ctx.moveTo(i, -1000) 
+        ctx.lineTo(i, 1000)
+        ctx.stroke()
+
+        ctx.beginPath()
+        ctx.moveTo(-1000, i)
+        ctx.lineTo(1000, i)
+        ctx.stroke()
+    }
+    ctx.globalAlpha = 1
+
+    forEachEntity(function (entity, entityType) {
+        ctx.fillStyle = getEntityColor(entityType)
+        ctx.beginPath()
+        ctx.rect(
+            entity.x - ENTITY_SIZE/2,
+            entity.y - ENTITY_SIZE/2,
+            ENTITY_SIZE, ENTITY_SIZE)
+        ctx.fill()
+        if (selection === entity) {
+            ctx.lineWidth = 5
+            ctx.stroke()
+        }
+    })
+
+    ctx.restore()
+
+    if (selection) {
+        let i = 20
+        ctx.fillStyle = 'black'
+        for (let prop in selection) {
+            ctx.fillText(`${prop}: ${selection[prop]}`, 20, i)
+            i += 30
+        }
+    }
+}
+render()
+
+const keyboard = {}
+
+const mapping = {
+    'a': 'left',
+    'd': 'right',
+    'w': 'up',
+    's': 'down'
+}
+
+document.addEventListener('keydown', function (event) {
+    keyboard[mapping[event.key]] = true
+})
+
+document.addEventListener('keyup', function (event) {
+    keyboard[mapping[event.key]] = false
+})
+
+function getClosestEntityToMouse () {
+
+}
+
+document.addEventListener('click', function (event) {
+    const { pageX, pageY } = event
+    closestEntity = null
+    let closestDistance = Infinity
+
+    forEachEntity(entity => {
+        const dist = Math.pow(pageX - cameraX - entity.x, 2) +
+                     Math.pow(pageY - cameraY - entity.y, 2)
+        if (dist < closestDistance) {
+            closestDistance = dist
+            closestEntity = entity
+        }
+    })
+
+    selection = closestEntity
+    console.log(selection)
+})
+
+window.onload = function () {
+    const socket = io(`http://localhost:${port}/`)
+
+    socket.on('connect', function () {
+        console.log('connect')
+    })
+    socket.on('state', function (newState) {
+        state = newState
+
+        // needs id to match
+        if (selection) {
+            selection = findEntity(entity => {
+                return (selection.id === entity.id)
+            })
+        }
+        if (closestEntity) {
+            closestEntity = findEntity(entity => {
+                return (closestEntity.id === entity.id)
+            })
+        }
+    })
+}
+</script>
+</body>
+</html>
