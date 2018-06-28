@@ -39,3 +39,11 @@ Only entity's:
 will be taken into account.
 
 Entity's need an `id` in order to be selectable for longer than one frame (it is needed in order to find it in the new state).
+
+## Controls
+
+Move the camera using the WASD keys.
+
+Use -/+ to zoom.
+
+Click to select an entity and inspect it. (it also gets logged into the console)
