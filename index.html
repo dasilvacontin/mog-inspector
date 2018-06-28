@@ -164,7 +164,9 @@ function render () {
         let i = 20
         ctx.fillStyle = 'black'
         for (let prop in selection) {
-            ctx.fillText(`${prop}: ${selection[prop]}`, 20, i)
+            let value = selection[prop]
+            if (typeof value === 'object') value = JSON.stringify(value)
+            ctx.fillText(`${prop}: ${value}`, 20, i)
             i += 30
         }
     }
