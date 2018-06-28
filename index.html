@@ -15,6 +15,7 @@
 </head>
 <body>
 <script>
+const SPEED_VECTOR_SCALE = 30
 const port = prompt('localhost:XXXX?')
 
 document.write(`<script src="http://localhost:${port}/socket.io/socket.io.js"><\/script>`)
@@ -75,14 +76,23 @@ function render () {
     ctx.fillRect(0,0,canvas.width,canvas.height)
     ctx.globalAlpha = 1
 
+    let oldCameraX = cameraX
+    let oldCameraY = cameraY
+
+    if (keyboard.up) cameraY++
+    if (keyboard.down) cameraY--
+    if (keyboard.left) cameraX++
+    if (keyboard.right) cameraX--
+
+    /* unlock camera if moved camera manually */
+    if (oldCameraX !== cameraX || oldCameraY !== cameraY) {
+        selection = null
+    }
+
+    /* follow target if locked */
     if (selection) {
         cameraX = canvas.width/2 - selection.x
         cameraY = canvas.height/2 - selection.y
-    } else {
-        if (keyboard.up) cameraY++
-        if (keyboard.down) cameraY--
-        if (keyboard.left) cameraX++
-        if (keyboard.right) cameraX--
     }
 
     ctx.save()
@@ -112,8 +122,31 @@ function render () {
             ENTITY_SIZE, ENTITY_SIZE)
         ctx.fill()
         if (selection === entity) {
+            const oldLineWidth = ctx.lineWidth
             ctx.lineWidth = 5
             ctx.stroke()
+            ctx.lineWidth = oldLineWidth
+        }
+        if (entity.vx != null && entity.vy != null) {
+            ctx.save()
+            ctx.translate(entity.x, entity.y)
+            ctx.beginPath()
+            ctx.moveTo(0,0)
+            const endX = entity.vx * SPEED_VECTOR_SCALE
+            const endY = entity.vy * SPEED_VECTOR_SCALE
+            ctx.lineTo(endX, endY)
+            ctx.strokeStyle = 'black'
+            ctx.stroke()
+
+            ctx.translate(endX, endY)
+            ctx.rotate(-Math.atan2(endX, endY))
+            ctx.moveTo(0,0)
+            ctx.lineTo( 4,-8)
+            ctx.lineTo(-4,-8)
+            ctx.fillStyle = 'black'
+            ctx.fill()
+
+            ctx.restore()
         }
     })
 
