@@ -115,13 +115,19 @@ function render () {
     ctx.globalAlpha = 1
 
     forEachEntity(function (entity, entityType) {
+        ctx.save()
+        ctx.translate(entity.x, entity.y)
         ctx.fillStyle = getEntityColor(entityType)
         ctx.beginPath()
         ctx.rect(
-            entity.x - ENTITY_SIZE/2,
-            entity.y - ENTITY_SIZE/2,
+            -ENTITY_SIZE/2,
+            -ENTITY_SIZE/2,
             ENTITY_SIZE, ENTITY_SIZE)
         ctx.fill()
+        if (entity.username) {
+            ctx.textAlign = 'center'
+            ctx.fillText(entity.username, 0, ENTITY_SIZE/2 + 12)
+        }
         if (selection === entity) {
             const oldLineWidth = ctx.lineWidth
             ctx.lineWidth = 5
@@ -129,8 +135,6 @@ function render () {
             ctx.lineWidth = oldLineWidth
         }
         if (entity.vx != null && entity.vy != null) {
-            ctx.save()
-            ctx.translate(entity.x, entity.y)
             ctx.beginPath()
             ctx.moveTo(0,0)
             const endX = entity.vx * SPEED_VECTOR_SCALE
@@ -146,9 +150,8 @@ function render () {
             ctx.lineTo(-4,-8)
             ctx.fillStyle = 'black'
             ctx.fill()
-
-            ctx.restore()
         }
+        ctx.restore()
     })
 
     ctx.restore()

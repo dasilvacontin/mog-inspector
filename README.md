@@ -8,6 +8,7 @@ Expects `'state'` socket.io events to be sent, with payload (`state` structure) 
 {
     "entityType1": [
         {
+            "username": "Tsunemori",
             "x": 50,
             "y": 30,
             "vx": 2,
@@ -34,6 +35,7 @@ Expects `'state'` socket.io events to be sent, with payload (`state` structure) 
 Only entity's:
 - position (`x` and `y`)
 - speed (`vx` and `vy`)
+- `username`
 will be taken into account.
 
 Entity's need an `id` in order to be selectable for longer than one frame (it is needed in order to find it in the new state).
