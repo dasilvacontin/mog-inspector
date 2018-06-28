@@ -67,6 +67,7 @@ function getEntityColor (entityType) {
     return color
 }
 
+const CAMERA_SPEED = 4
 function render () {
     requestAnimationFrame(render)
     if (state == null) return
@@ -79,10 +80,10 @@ function render () {
     let oldCameraX = cameraX
     let oldCameraY = cameraY
 
-    if (keyboard.up) cameraY++
-    if (keyboard.down) cameraY--
-    if (keyboard.left) cameraX++
-    if (keyboard.right) cameraX--
+    if (keyboard.up) cameraY += CAMERA_SPEED
+    if (keyboard.down) cameraY -= CAMERA_SPEED
+    if (keyboard.left) cameraX += CAMERA_SPEED
+    if (keyboard.right) cameraX -= CAMERA_SPEED
 
     /* unlock camera if moved camera manually */
     if (oldCameraX !== cameraX || oldCameraY !== cameraY) {
