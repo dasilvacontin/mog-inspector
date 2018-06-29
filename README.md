@@ -2,6 +2,10 @@
 
 Debugger for multiplayer online games running locally using Socket.io.
 
+## Expected Socket.io events
+
+### `state`
+
 Expects `'state'` socket.io events to be sent, with payload (`state` structure) such as:
 
 ```json
@@ -39,6 +43,22 @@ Only entity's:
 will be taken into account.
 
 Entity's need an `id` in order to be selectable for longer than one frame (it is needed in order to find it in the new state).
+
+### `inspector-config` (optional)
+
+The payload is a entityType->color map, which will be used for rendering.
+
+server example:
+```js
+  socket.on('im-inspector', function () {
+    console.log('inspector attached')
+    socket.emit('inspector-config', {
+      players: 'blue',
+      enemies: 'red',
+      coins: 'yellow'
+    })
+  })
+```
 
 ## Controls
 

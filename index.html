@@ -58,7 +58,7 @@ function findEntity (condition) {
 }
 
 let colorNextI = 0
-const entityToColor = {}
+let entityToColor = {}
 function getEntityColor (entityType) {
     let color = entityToColor[entityType]
     if (!color) {
@@ -219,8 +219,15 @@ window.onload = function () {
     const socket = io(`http://localhost:${port}/`)
 
     socket.on('connect', function () {
-        console.log('connect')
+        console.log('connected')
+        socket.emit('im-inspector')
     })
+
+    socket.on('inspector-config', function (config) {
+        entityToColor = config
+        console.log('got config', config)
+    })
+
     socket.on('state', function (newState) {
         state = newState
 
