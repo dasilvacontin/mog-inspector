@@ -60,6 +60,12 @@ server example:
   })
 ```
 
+## Emitted events
+
+### `im-inspector`
+
+Sent after connection, to let the server know the client is the mog-inspector. No payload.
+
 ## Controls
 
 Move the camera using the WASD keys.
