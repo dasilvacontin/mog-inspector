@@ -16,9 +16,17 @@
 <body>
 <script>
 const SPEED_VECTOR_SCALE = 30
-const port = prompt('localhost:XXXX?')
-
-document.write(`<script src="http://localhost:${port}/socket.io/socket.io.js"><\/script>`)
+let url = prompt('Your game\'s address? e.g.:\n' +
+                 ' - http://localhost:3000/\n' +
+                 ' - https://ag-drift.herokuapp.com/\n' +
+                 '(Short-hand for "localhost:3000" is just introducing the port number)')
+if (url[url.length-1] === '/') {
+    url = url.slice(0, url.length-1)
+}
+if (Number(url) !== NaN) {
+    url = `http://localhost:${url}`
+}
+document.write(`<script src="${url}/socket.io/socket.io.js"><\/script>`)
 
 const canvas = document.createElement('canvas')
 document.body.appendChild(canvas)
@@ -216,7 +224,7 @@ document.addEventListener('click', function (event) {
 })
 
 window.onload = function () {
-    const socket = io(`http://localhost:${port}/`)
+    const socket = io(url)
 
     socket.on('connect', function () {
         console.log('connected')
