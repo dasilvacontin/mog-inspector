@@ -23,11 +23,13 @@ let url = prompt('Your game\'s address? e.g.:\n' +
 if (url[url.length-1] === '/') {
     url = url.slice(0, url.length-1)
 }
-if (Number(url) !== NaN) {
+if (!isNaN(Number(url))) {
     url = `http://localhost:${url}`
 }
 document.write(`<script src="${url}/socket.io/socket.io.js"><\/script>`)
+</script>
 
+<script>
 const canvas = document.createElement('canvas')
 document.body.appendChild(canvas)
 
