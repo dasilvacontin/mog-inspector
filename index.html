@@ -91,12 +91,12 @@ function render () {
     let oldCameraX = cameraX
     let oldCameraY = cameraY
 
-    if (keyboard.up) cameraY -= CAMERA_SPEED
-    if (keyboard.down) cameraY += CAMERA_SPEED
-    if (keyboard.left) cameraX -= CAMERA_SPEED
-    if (keyboard.right) cameraX += CAMERA_SPEED
     if (keyboard.zoom_inc) scale += .01
     if (keyboard.zoom_dec) scale -= .01
+    if (keyboard.up) cameraY -= CAMERA_SPEED/scale
+    if (keyboard.down) cameraY += CAMERA_SPEED/scale
+    if (keyboard.left) cameraX -= CAMERA_SPEED/scale
+    if (keyboard.right) cameraX += CAMERA_SPEED/scale
 
     /* unlock camera if moved camera manually */
     if (oldCameraX !== cameraX || oldCameraY !== cameraY) {
